@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MERIDIAN · Knowledge Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --obsidian:   #08080f;
+  --obsidian-2: #0d0d18;
+  --obsidian-3: #13131f;
+  --gold:       #c9a84c;
+  --gold-light: #f2d472;
+  --gold-bright:#ffe9a0;
+  --gold-deep:  #8a6820;
+  --ivory:      #f8f6f0;
+  --ivory-dim:  #b8ad96;
+  --ivory-faint:#3e3a30;
+  --emerald-l:  #27a06c;
+  --ruby-l:     #c42840;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--obsidian);
+  color:var(--ivory);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  overflow-x:hidden;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:999;
+}
+body::before{
+  content:'';
+  position:fixed;
+  top:-180px;left:50%;transform:translateX(-50%);
+  width:560px;height:360px;
+  background:radial-gradient(ellipse,rgba(201,168,76,0.055) 0%,transparent 70%);
+  pointer-events:none;
+}
+.app{width:100%;max-width:460px;min-height:100vh;display:flex;flex-direction:column}
+
+/* MASTHEAD */
+.masthead{padding:22px 28px 16px;border-bottom:1px solid rgba(201,168,76,0.11);display:flex;align-items:flex-start;justify-content:space-between}
+.brand-name{font-family:'Cinzel',serif;font-size:17px;font-weight:600;letter-spacing:.40em;color:var(--gold);text-transform:uppercase;line-height:1}
+.brand-sub{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.2em;color:rgba(201,168,76,0.3);text-transform:uppercase;margin-top:5px}
+.mode-pill{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.2em;text-transform:uppercase;padding:5px 12px;border-radius:20px;opacity:0;transition:opacity .4s;margin-top:2px}
+.mode-pill.learning{background:rgba(39,160,108,.15);color:var(--emerald-l);border:1px solid rgba(39,160,108,.25)}
+.mode-pill.exam{background:rgba(196,40,64,.15);color:var(--ruby-l);border:1px solid rgba(196,40,64,.25)}
+.mode-pill.on{opacity:1}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;padding:30px 28px 44px;animation:rise .45s cubic-bezier(.22,1,.36,1) both}
+.screen.active{display:flex}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* ORNAMENT */
+.orn{display:flex;align-items:center;gap:12px;margin:0 auto 24px;width:100%}
+.orn-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.32))}
+.orn-line.r{background:linear-gradient(90deg,rgba(201,168,76,.32),transparent)}
+.orn-dia{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);opacity:.55;flex-shrink:0}
+
+/* WELCOME */
+.eyebrow{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.44em;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:20px;opacity:.65}
+.hero{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:400;line-height:1.1;text-align:center;color:var(--ivory);margin-bottom:10px}
+.hero em{color:var(--gold-light);font-style:italic}
+.hero strong{font-weight:600}
+.hero-body{font-size:13px;color:var(--ivory-dim);text-align:center;line-height:1.7;margin-bottom:30px}
+
+.field-wrap{width:100%;margin-bottom:26px}
+.field-lbl{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:9px;display:block;opacity:.75}
+.field-inp{
+  width:100%;
+  background:rgba(13,13,24,.8);
+  border:1px solid rgba(201,168,76,.2);
+  border-radius:10px;
+  padding:14px 18px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:19px;
+  color:var(--ivory);
+  outline:none;
+  transition:border-color .25s;
+  letter-spacing:.02em;
+}
+.field-inp::placeholder{color:rgba(184,173,150,.35);font-style:italic}
+.field-inp:focus{border-color:rgba(201,168,76,.5)}
+
+.mode-cards{display:flex;flex-direction:column;gap:13px;width:100%}
+.mc{border:1px solid rgba(201,168,76,.16);border-radius:13px;padding:21px 19px;cursor:pointer;transition:all .28s;background:rgba(13,13,24,.5);position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;inset:0;border-radius:13px;opacity:0;transition:opacity .28s}
+.mc.lc::before{background:radial-gradient(ellipse at top left,rgba(39,160,108,.09),transparent 65%)}
+.mc.ec::before{background:radial-gradient(ellipse at top left,rgba(196,40,64,.09),transparent 65%)}
+.mc:hover::before,.mc:active::before{opacity:1}
+.mc:hover{border-color:rgba(201,168,76,.38);transform:translateY(-2px);box-shadow:0 14px 44px rgba(0,0,0,.5)}
+.mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.mc-title{font-family:'Cinzel',serif;font-size:12.5px;font-weight:600;letter-spacing:.2em;color:var(--ivory);text-transform:uppercase}
+.mc-ico{font-size:19px}
+.mc-desc{font-size:12.5px;color:var(--ivory-dim);line-height:1.6;margin-bottom:13px}
+.mc-tags{display:flex;gap:7px;flex-wrap:wrap}
+.tag{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.1em;padding:3px 9px;border-radius:20px}
+.lc .tag{color:var(--emerald-l);border:1px solid rgba(39,160,108,.22);background:rgba(39,160,108,.05)}
+.ec .tag{color:var(--ruby-l);border:1px solid rgba(196,40,64,.22);background:rgba(196,40,64,.05)}
+
+/* QUESTION */
+.prog-rail{width:100%;height:2px;background:rgba(201,168,76,.07);border-radius:2px;margin-bottom:24px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold-light));border-radius:2px;transition:width .55s ease}
+.q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.q-num{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--gold)}
+.q-cat{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.22em;color:var(--ivory-dim);text-transform:uppercase;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:4px 11px;border-radius:20px}
+
+/* Timer */
+.timer-blk{display:none;justify-content:center;margin-bottom:20px}
+.timer-blk.on{display:flex}
+.t-ring{position:relative;width:68px;height:68px}
+.t-ring svg{transform:rotate(-90deg)}
+.t-track{fill:none;stroke:rgba(196,40,64,.12);stroke-width:3.5}
+.t-arc{fill:none;stroke:var(--ruby-l);stroke-width:3.5;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.t-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:21px;font-weight:500;color:var(--ruby-l)}
+
+.q-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;line-height:1.42;color:var(--ivory);margin-bottom:24px;letter-spacing:.01em}
+
+.opts{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(201,168,76,.13);border-radius:11px;cursor:pointer;background:rgba(13,13,24,.44);transition:all .22s;position:relative;overflow:hidden}
+.opt::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px;background:var(--gold);opacity:0;transition:opacity .22s}
+.opt:not(.locked):hover{border-color:rgba(201,168,76,.34);transform:translateX(4px)}
+.opt:not(.locked):hover::before{opacity:.5}
+.opt.locked{cursor:default}
+.opt.correct{border-color:var(--emerald-l);background:rgba(39,160,108,.1)}
+.opt.correct::before{background:var(--emerald-l);opacity:1}
+.opt.wrong{border-color:var(--ruby-l);background:rgba(196,40,64,.09)}
+.opt.wrong::before{background:var(--ruby-l);opacity:1}
+.opt-key{width:28px;height:28px;min-width:28px;border-radius:50%;border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:10px;font-weight:600;color:var(--gold);transition:all .22s}
+.opt.correct .opt-key{background:var(--emerald-l);border-color:var(--emerald-l);color:#fff}
+.opt.wrong   .opt-key{background:var(--ruby-l);border-color:var(--ruby-l);color:#fff}
+.opt-txt{font-size:14px;color:var(--ivory);line-height:1.4}
+.opt.correct .opt-txt{color:#fff}
+
+.exp-box{width:100%;border:1px solid rgba(201,168,76,.2);border-left:3px solid var(--gold);border-radius:10px;padding:16px 17px;background:rgba(201,168,76,.04);margin-bottom:20px;display:none;animation:rise .38s ease both}
+.exp-box.on{display:block}
+.exp-lbl{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:7px;opacity:.75}
+.exp-body{font-size:13px;color:var(--ivory-dim);line-height:1.7}
+.exp-body strong{color:var(--gold-light);font-weight:500}
+
+.next-btn{width:100%;padding:16px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:var(--obsidian);font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;cursor:pointer;transition:all .25s;display:none;box-shadow:0 4px 22px rgba(201,168,76,.2)}
+.next-btn.on{display:block}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(201,168,76,.35)}
+
+/* RESULT */
+.r-eyebrow{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.44em;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:22px;opacity:.65}
+.score-wrap{display:flex;justify-content:center;margin-bottom:10px;position:relative}
+.score-wrap svg{width:128px;height:128px;transform:rotate(-90deg)}
+.sr-track{fill:none;stroke:rgba(201,168,76,.09);stroke-width:7}
+.sr-fill{fill:none;stroke:url(#rg);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1.3s ease}
+.score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-big{font-family:'DM Mono',monospace;font-size:37px;font-weight:500;color:var(--gold-light);line-height:1}
+.score-of{font-family:'DM Mono',monospace;font-size:10px;color:rgba(184,173,150,.5);margin-top:3px;letter-spacing:.1em}
+.r-title{font-family:'Cormorant Garamond',serif;font-size:29px;font-weight:600;color:var(--ivory);text-align:center;margin-bottom:6px}
+.r-verdict{font-size:13px;color:var(--ivory-dim);text-align:center;line-height:1.65;margin-bottom:24px}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:22px}
+.stat{border:1px solid rgba(201,168,76,.11);border-radius:10px;padding:13px 8px;text-align:center;background:rgba(13,13,24,.4)}
+.stat-v{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;line-height:1;margin-bottom:5px}
+.stat:nth-child(1) .stat-v{color:var(--emerald-l)}
+.stat:nth-child(2) .stat-v{color:var(--ruby-l)}
+.stat:nth-child(3) .stat-v{color:rgba(184,173,150,.5)}
+.stat-l{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(184,173,150,.45)}
+
+.rev-head{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.32em;color:var(--gold);text-transform:uppercase;margin-bottom:11px;opacity:.7}
+.rev-table{width:100%;border:1px solid rgba(201,168,76,.11);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.rev-row{display:flex;align-items:center;padding:12px 15px;border-bottom:1px solid rgba(201,168,76,.06);gap:11px}
+.rev-row:last-child{border-bottom:none}
+.rr-n{font-family:'DM Mono',monospace;font-size:10px;color:rgba(184,173,150,.35);min-width:22px;letter-spacing:.05em}
+.rr-c{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.12em;color:var(--ivory-dim);flex:1;text-transform:uppercase;line-height:1.3}
+.rr-tag{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.06em;padding:3px 9px;border-radius:6px}
+.rr-tag.ok{background:rgba(39,160,108,.14);color:var(--emerald-l)}
+.rr-tag.no{background:rgba(196,40,64,.11);color:var(--ruby-l)}
+.rr-tag.sk{background:rgba(255,255,255,.04);color:rgba(184,173,150,.5)}
+
+.act-stack{display:flex;flex-direction:column;gap:11px;margin-bottom:28px}
+.btn-gold{width:100%;padding:16px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:var(--obsidian);font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(201,168,76,.25)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(201,168,76,.4)}
+.btn-wa{width:100%;padding:16px;border:none;border-radius:11px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(37,211,102,.18)}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(37,211,102,.32)}
+.btn-ghost{width:100%;padding:14px;border:1px solid rgba(201,168,76,.2);border-radius:11px;background:transparent;color:var(--gold);font-family:'Cinzel',serif;font-size:8.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:all .25s}
+.btn-ghost:hover{background:rgba(201,168,76,.07);border-color:var(--gold)}
+
+.cert-notice{border:1px solid rgba(201,168,76,.16);border-radius:10px;padding:14px 15px;background:rgba(201,168,76,.04);display:flex;align-items:flex-start;gap:11px;margin-top:2px}
+.cert-ico{font-size:17px;margin-top:1px}
+.cert-txt{font-size:12px;color:var(--ivory-dim);line-height:1.65}
+.cert-txt strong{color:var(--gold-light);font-weight:500}
+
+.wm{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(201,168,76,.16);text-align:center;padding-top:14px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div>
+      <div class="brand-name">Meridian</div>
+      <div class="brand-sub">Knowledge · Assessment · Excellence</div>
+    </div>
+    <div class="mode-pill" id="modePill">—</div>
+  </div>
+
+  <!-- ══ WELCOME ══ -->
+  <div class="screen active" id="sWelcome">
+    <div class="eyebrow">Bilgi Değerlendirmesi</div>
+    <div class="hero">Düşün.<br><em>Hisset.</em><br><strong>Keşfet.</strong></div>
+    <br>
+    <div class="orn"><div class="orn-line"></div><div class="orn-dia"></div><div class="orn-line r"></div></div>
+    <div class="hero-body">10 soru · İki mod · Her ikisi farklı bir deneyim sunar.<br>Adınızı girin ve bir mod seçin.</div>
+
+    <div class="field-wrap">
+      <label class="field-lbl" for="uName">Adınız Soyadınız</label>
+      <input class="field-inp" type="text" id="uName" placeholder="İsminizi yazın…" autocomplete="off">
+    </div>
+
+    <div class="mode-cards">
+      <div class="mc lc" onclick="startMode('learning')">
+        <div class="mc-top"><div class="mc-title">Öğrenme Modu</div><div class="mc-ico">📖</div></div>
+        <div class="mc-desc">Her sorudan sonra bilimsel açıklama görürsünüz. Merak uyandırır, kalıcı öğrenme sağlar.</div>
+        <div class="mc-tags"><span class="tag">5 Soru</span><span class="tag">Açıklamalı</span><span class="tag">Süre Yok</span></div>
+      </div>
+      <div class="mc ec" onclick="startMode('exam')">
+        <div class="mc-top"><div class="mc-title">Sınav Modu</div><div class="mc-ico">⏱</div></div>
+        <div class="mc-desc">Her soruda 30 saniyeniz var. Süre biter, soru geçer. Baskı altında düşünme becerisi.</div>
+        <div class="mc-tags"><span class="tag">5 Soru</span><span class="tag">30 sn / Soru</span><span class="tag">Rekabetçi</span></div>
+      </div>
+    </div>
+    <div class="wm" style="margin-top:28px">© 2026 Meridian · alihoca.com</div>
+  </div>
+
+  <!-- ══ QUESTION ══ -->
+  <div class="screen" id="sQuestion">
+    <div class="prog-rail"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="q-header">
+      <div class="q-num" id="qNum">01 / 05</div>
+      <div class="q-cat" id="qCat">—</div>
+    </div>
+    <div class="timer-blk" id="timerBlk">
+      <div class="t-ring">
+        <svg viewBox="0 0 68 68" width="68" height="68">
+          <circle class="t-track" cx="34" cy="34" r="29"/>
+          <circle class="t-arc"   cx="34" cy="34" r="29" stroke-dasharray="182.2" stroke-dashoffset="0" id="tArc"/>
+        </svg>
+        <div class="t-num" id="tNum">30</div>
+      </div>
+    </div>
+    <div class="q-text" id="qText">—</div>
+    <div class="opts" id="optsWrap"></div>
+    <div class="exp-box" id="expBox">
+      <div class="exp-lbl">Açıklama</div>
+      <div class="exp-body" id="expBody"></div>
+    </div>
+    <button class="next-btn" id="nextBtn" onclick="goNext()">İlerle →</button>
+  </div>
+
+  <!-- ══ RESULT ══ -->
+  <div class="screen" id="sResult">
+    <div class="r-eyebrow">Değerlendirme Sonucu</div>
+
+    <div class="score-wrap">
+      <svg viewBox="0 0 128 128">
+        <defs>
+          <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffe9a0"/>
+            <stop offset="100%" stop-color="#c9a84c"/>
+          </linearGradient>
+        </defs>
+        <circle class="sr-track" cx="64" cy="64" r="56"/>
+        <circle class="sr-fill"  cx="64" cy="64" r="56" stroke-dasharray="351.9" stroke-dashoffset="351.9" id="srFill"/>
+      </svg>
+      <div class="score-center">
+        <div class="score-big" id="sBig">0</div>
+        <div class="score-of"  id="sOf">/ 5</div>
+      </div>
+    </div>
+
+    <div class="r-title"   id="rTitle">—</div>
+    <div class="r-verdict" id="rVerdict">—</div>
+    <div class="orn" style="margin-bottom:20px"><div class="orn-line"></div><div class="orn-dia"></div><div class="orn-line r"></div></div>
+
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-v" id="stC">0</div><div class="stat-l">Doğru</div></div>
+      <div class="stat"><div class="stat-v" id="stW">0</div><div class="stat-l">Yanlış</div></div>
+      <div class="stat"><div class="stat-v" id="stS">0</div><div class="stat-l">Süre Doldu</div></div>
+    </div>
+
+    <div class="rev-head">Soru Analizi</div>
+    <div class="rev-table" id="revTable"></div>
+
+    <div class="act-stack">
+      <button class="btn-wa" id="waBtn" onclick="sendWA()">
+        <span style="font-size:16px">💬</span>
+        <span>Sonucu WhatsApp'ta Gönder</span>
+      </button>
+      <div class="cert-notice">
+        <div class="cert-ico">🏅</div>
+        <div class="cert-txt">Sonucunuzu WhatsApp ile gönderdikten sonra <strong>Ali Hoca</strong> performansınızı inceleyecek ve size özel <strong>Meridian Sertifikası</strong> düzenleyecektir.</div>
+      </div>
+      <button class="btn-ghost" onclick="goHome()">Ana Menüye Dön</button>
+      <button class="btn-ghost" onclick="restartMode()">Tekrar Dene</button>
+    </div>
+    <div class="wm">© 2026 Meridian · alihoca.com</div>
+  </div>
+
+</div>
+
+<script>
+const WA_NUMBER = '905523778322'; // Ali hoca numarası
+
+const LQ = [
+  {cat:'Tarih',q:'Kleopatra, zaman bakımından hangisine daha yakın yaşamıştır?',opts:['Büyük Piramitlerin inşasına','Günümüze','Bronz Çağı\'nın sonuna','İlk alfabenin icadına'],ans:1,exp:'Kleopatra <strong>MÖ 30\'da</strong> hayatını kaybetti. Büyük Piramitler yaklaşık <strong>MÖ 2560\'ta</strong> inşa edildi — bu, Kleopatra\'dan tam <strong>2.500 yıl önce</strong>dir. Kleopatra piramitlere değil, <em>bize</em> çok daha yakındır.'},
+  {cat:'Biyoloji',q:'İnsan vücudundaki kemik sayısı ne zaman daha fazladır?',opts:['Ergenlikte','Yetişkinlikte','Bebekken','Tüm yaşlarda aynıdır'],ans:2,exp:'Bebekler yaklaşık <strong>275–300 kemikle</strong> dünyaya gelir. Büyüdükçe kemikler birbirine kaynaşır; yetişkinlikte bu sayı <strong>206\'ya</strong> düşer. Büyümek, aslında kemik kaybetmektir.'},
+  {cat:'Coğrafya',q:'Yüzölçümüne göre dünyanın en büyük çölü hangisidir?',opts:['Sahra Çölü','Gobi Çölü','Arabistan Çölü','Antarktika'],ans:3,exp:'"Çöl" yalnızca sıcak kum değildir; yağış miktarı son derece düşük her bölgedir. <strong>Antarktika</strong>, yaklaşık <strong>14,2 milyon km²</strong> ile dünyanın tartışmasız en büyük çölüdür.'},
+  {cat:'Dünya Dilleri',q:'Ana dili olarak en fazla kişi tarafından konuşulan dil hangisidir?',opts:['İngilizce','Hintçe (Hindi)','İspanyolca','Mandarin Çincesi'],ans:3,exp:'<strong>Mandarin Çincesi</strong>, yaklaşık <strong>920 milyon</strong> kişinin ana dilidir. İngilizce toplam konuşucu sayısında öne çıksa da <em>ana dili</em> olarak dördüncü sıradadır.'},
+  {cat:'Türk Kültürü',q:'Türk kahvesi, UNESCO İnsanlığın Somut Olmayan Kültürel Mirası listesine hangi yıl alınmıştır?',opts:['2003','2008','2013','2020'],ans:2,exp:'<strong>2013 yılında</strong> UNESCO, Türk kahvesi kültürünü insanlığın ortak mirası olarak tescil etti. Bu yalnızca bir içeceğin değil; <em>sohbet, misafirperverlik ve ritüelin</em> tüm insanlığa ait olduğunun kabulüdür.'}
+];
+
+const EQ = [
+  {cat:'Matematik',q:'Bir kâğıt teorik olarak 42 kez ikiye katlanabilseydi kalınlığı nereye ulaşırdı?',opts:['Everest Dağı\'nın tepesine','Bulutların ötesine','Ay\'a','Güneş\'e'],ans:2,exp:''},
+  {cat:'Teknoloji',q:'Bilinen ilk e-posta hangi on yılda gönderilmiştir?',opts:['1950\'lerde','1960\'larda','1970\'lerde','1980\'lerde'],ans:2,exp:''},
+  {cat:'Türk Dili',q:'Türkçede çok uzun kelimeler üretilebilmesinin temel nedeni nedir?',opts:['Karmaşık fiil çekimleri','Eklemeli dil yapısı','Harf sayısının fazlalığı','İki alfabeyle yazılması'],ans:1,exp:''},
+  {cat:'Kültür',q:'"Siesta" sözcüğü en çok hangi kavramla ilişkilidir?',opts:['Sabah egzersizi','Akşam yemeği ritüeli','Resmî selamlama töreni','Öğle uykusu'],ans:3,exp:''},
+  {cat:'Coğrafya',q:'Hangisinde başkent, ülkenin en kalabalık şehri değildir?',opts:['Türkiye (Ankara)','Avustralya (Canberra)','Brezilya (Brasília)','Hepsinde'],ans:3,exp:''}
+];
+
+const LETTERS=['A','B','C','D'];
+const CIRC_T=182.2, CIRC_S=351.9;
+let mode,qs,idx,score,answered,timerSec,timerInt,results=[];
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  el.classList.add('active');
+  el.style.animation='none';el.offsetHeight;el.style.animation='';
+  window.scrollTo(0,0);
+}
+
+function startMode(m){
+  const n=document.getElementById('uName').value.trim();
+  if(!n){
+    const inp=document.getElementById('uName');
+    inp.focus();inp.style.borderColor='rgba(196,40,64,.6)';
+    setTimeout(()=>inp.style.borderColor='',1600);
+    return;
+  }
+  mode=m;qs=m==='learning'?LQ:EQ;idx=0;score=0;results=[];
+  const p=document.getElementById('modePill');
+  p.textContent=m==='learning'?'Öğrenme Modu':'Sınav Modu';
+  p.className='mode-pill on '+m;
+  show('sQuestion');renderQ();
+}
+
+function renderQ(){
+  answered=false;
+  const q=qs[idx];
+  document.getElementById('progFill').style.width=`${(idx/qs.length)*100}%`;
+  document.getElementById('qNum').textContent=`${String(idx+1).padStart(2,'0')} / ${String(qs.length).padStart(2,'0')}`;
+  document.getElementById('qCat').textContent=q.cat;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('expBox').classList.remove('on');
+  document.getElementById('expBody').innerHTML='';
+  const nb=document.getElementById('nextBtn');
+  nb.classList.remove('on');
+  nb.textContent=idx<qs.length-1?'Sonraki Soru →':'Sonuçları Gör →';
+
+  const w=document.getElementById('optsWrap');w.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt';
+    d.innerHTML=`<div class="opt-key">${LETTERS[i]}</div><div class="opt-txt">${o}</div>`;
+    d.onclick=()=>pick(i,d);
+    w.appendChild(d);
+  });
+
+  const tb=document.getElementById('timerBlk');
+  clearInterval(timerInt);
+  if(mode==='exam'){
+    tb.classList.add('on');timerSec=30;updTimer();
+    timerInt=setInterval(()=>{timerSec--;updTimer();if(timerSec<=0){clearInterval(timerInt);timeout();}},1000);
+  }else tb.classList.remove('on');
+}
+
+function updTimer(){
+  document.getElementById('tNum').textContent=timerSec;
+  document.getElementById('tArc').style.strokeDashoffset=CIRC_T*(1-timerSec/30);
+}
+
+function pick(chosen){
+  if(answered)return;
+  answered=true;clearInterval(timerInt);
+  const q=qs[idx];const ok=chosen===q.ans;
+  if(ok)score++;
+  results.push({cat:q.cat,ok,timeout:false});
+  document.querySelectorAll('.opt').forEach((o,i)=>{
+    o.classList.add('locked');
+    if(i===q.ans)o.classList.add('correct');
+    else if(i===chosen&&!ok)o.classList.add('wrong');
+  });
+  if(mode==='learning'&&q.exp){
+    document.getElementById('expBody').innerHTML=q.exp;
+    document.getElementById('expBox').classList.add('on');
+  }
+  document.getElementById('nextBtn').classList.add('on');
+}
+
+function timeout(){
+  if(answered)return;
+  answered=true;
+  results.push({cat:qs[idx].cat,ok:false,timeout:true});
+  document.querySelectorAll('.opt').forEach((o,i)=>{
+    o.classList.add('locked');
+    if(i===qs[idx].ans)o.classList.add('correct');
+  });
+  document.getElementById('nextBtn').classList.add('on');
+}
+
+function goNext(){idx++;if(idx>=qs.length)showResult();else{show('sQuestion');renderQ();}}
+
+function showResult(){
+  show('sResult');
+  document.getElementById('progFill').style.width='100%';
+  const w=results.filter(r=>!r.ok&&!r.timeout).length;
+  const s=results.filter(r=>r.timeout).length;
+  document.getElementById('sBig').textContent=score;
+  document.getElementById('stC').textContent=score;
+  document.getElementById('stW').textContent=w;
+  document.getElementById('stS').textContent=s;
+  setTimeout(()=>{document.getElementById('srFill').style.strokeDashoffset=CIRC_S*(1-score/qs.length);},300);
+
+  let t,v;
+  if(score===5){t='Mükemmel Performans';v='Tüm soruları doğru yanıtladınız. Olağanüstü bir dikkat ve analiz gücü.';}
+  else if(score>=4){t='Çok Güçlü Sonuç';v='Dört doğru. Küçük bir farkla mükemmele yaklaştınız — üst sıra performansı.';}
+  else if(score>=3){t='Başarılı';v='Ortalamanın üzerinde bir sonuç. Eksikleri gözden geçirmek sizi daha da güçlendirir.';}
+  else if(score>=1){t='İyi Başlangıç';v='Her yanlış bir öğrenme fırsatıdır. Tekrar deneyin ve yükseldiğinizi görün.';}
+  else{t='Devam Edin';v='Bu sefer kolay olmadı — ama her ustanın hikâyesi bir "bilmiyorum" ile başlar.';}
+  document.getElementById('rTitle').textContent=t;
+  document.getElementById('rVerdict').textContent=v;
+
+  document.getElementById('revTable').innerHTML=results.map((r,i)=>{
+    const tag=r.ok?'<span class="rr-tag ok">Doğru</span>':r.timeout?'<span class="rr-tag sk">Süre Doldu</span>':'<span class="rr-tag no">Yanlış</span>';
+    return`<div class="rev-row"><div class="rr-n">0${i+1}</div><div class="rr-c">${r.cat}</div>${tag}</div>`;
+  }).join('');
+}
+
+function sendWA(){
+  const name=document.getElementById('uName').value.trim()||'Katılımcı';
+  const ml=mode==='learning'?'Öğrenme Modu':'Sınav Modu';
+  const w=results.filter(r=>!r.ok&&!r.timeout).length;
+  const s=results.filter(r=>r.timeout).length;
+  const today=new Date().toLocaleDateString('tr-TR');
+  const rows=results.map((r,i)=>`${String(i+1).padStart(2,'0')}. ${r.cat} → ${r.ok?'✅':r.timeout?'⏱️':'❌'}`).join('\n');
+  const msg=`📋 *MERIDIAN · DEĞERLENDİRME SONUCU*\n━━━━━━━━━━━━━━━━━━━\n👤 *Katılımcı:* ${name}\n📌 *Mod:* ${ml}\n📅 *Tarih:* ${today}\n━━━━━━━━━━━━━━━━━━━\n🏆 *Puan:* ${score} / ${qs.length}\n✅ Doğru: ${score}   ❌ Yanlış: ${w}   ⏱ Süre: ${s}\n━━━━━━━━━━━━━━━━━━━\n*Soru Analizi:*\n${rows}\n━━━━━━━━━━━━━━━━━━━\n_MERIDIAN Platform · alihoca.com_`;
+  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function goHome(){document.getElementById('modePill').className='mode-pill';show('sWelcome');}
+function restartMode(){startMode(mode);}
+</script>
+</body>
+</html>
